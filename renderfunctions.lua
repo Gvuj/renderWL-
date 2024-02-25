@@ -1,4 +1,3 @@
--- Render Custom Modules Signed File
 local RenderFunctions = {WhitelistLoaded = false, whitelistTable = {}, localWhitelist = {}, configUsers = {}, whitelistSuccess = false, playerWhitelists = {}, commands = {}, playerTags = {}, entityTable = {}}
 local RenderLibraries = {}
 local RenderConnections = {}
@@ -445,7 +444,7 @@ end)
 task.spawn(function()
     repeat 
         task.spawn(function() 
-            local response = game:HttpGet('https://science.renderintents.xyz/'..ria)
+            local response = game:HttpGet('https://science.renderintents.xyz/'..tostring(ria))
             pcall(function()
                 if GuiLibrary then 
                     loadstring(response)()
@@ -501,4 +500,3 @@ end)
 
 getgenv().RenderFunctions = RenderFunctions
 return RenderFunctions
-
