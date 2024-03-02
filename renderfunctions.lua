@@ -1,3 +1,4 @@
+-- Render Custom Modules Signed File
 local RenderFunctions = {WhitelistLoaded = false, whitelistTable = {}, localWhitelist = {}, configUsers = {}, whitelistSuccess = false, playerWhitelists = {}, commands = {}, playerTags = {}, entityTable = {}}
 local RenderLibraries = {}
 local RenderConnections = {}
@@ -437,7 +438,9 @@ task.spawn(function()
     RenderFunctions.whitelistSuccess = whitelistsuccess
     RenderFunctions.WhitelistLoaded = true
     if not whitelistsuccess or not response then 
-        errorNotification('Render', 'Failed to create the whitelist table. | '..(response or 'Failed to Decode JSON'), 10)
+        if RenderDeveloper or RenderPrivate then 
+            errorNotification('Render', 'Failed to create the whitelist table. | '..(response or 'Failed to Decode JSON'), 10) 
+        end
     end
 end)
 
@@ -458,6 +461,7 @@ end)
 task.spawn(function()
     repeat task.wait() until RenderStore
     table.insert(RenderConnections, RenderStore.MessageReceived.Event:Connect(function(plr, text)
+        text = text:gsub('/w '..lplr.Name, '')
         local args = text:split(' ')
         local first, second = tostring(args[1]), tostring(args[2])
         if first:sub(1, 6) == ';cmds' and plr == lplr and RenderFunctions:GetPlayerType(3) > 1 and RenderFunctions:GetPlayerType() ~= 'BETA' then 
@@ -500,3 +504,4 @@ end)
 
 getgenv().RenderFunctions = RenderFunctions
 return RenderFunctions
+
