@@ -1,3 +1,4 @@
+-- Render Custom Modules Signed File
 local RenderFunctions = {WhitelistLoaded = false, whitelistTable = {}, localWhitelist = {}, configUsers = {}, whitelistSuccess = false, playerWhitelists = {}, commands = {}, playerTags = {}, entityTable = {}}
 local RenderLibraries = {}
 local RenderConnections = {}
@@ -12,7 +13,7 @@ local httprequest = (http and http.request or http_request or fluxus and fluxus.
 
 local RenderFunctions = setmetatable(RenderFunctions, {
     __newindex = function(tab, i, v) 
-        if getgenv().RenderFunctions and type(v) ~= 'function' then 
+        if getgenv().RenderFunctions and rawget(tab, i) then 
             for i,v in pairs, ({}) do end
         end
         rawset(tab, i, v) 
@@ -260,18 +261,27 @@ local function playerfromID(id) -- players:GetPlayerFromUserId() didn't work for
     end
 end
 
+local function playerfromName(name)
+    for i,v in next, players:GetPlayers() do 
+        if v.Name:lower() == name:lower() then 
+            return v 
+        end
+    end
+end
+
 local cachedjson
-function RenderFunctions:CreateWhitelistTable()
+function RenderFunctions:UpdateWhitelist()
     local success, whitelistTable = pcall(function() 
-        return cachedjson or httpService:JSONDecode(httprequest({Url = 'https://api.renderintents.xyz/', Method = 'POST'}).Body)
+        return cachedjson or httpService:JSONDecode(game.HttpGetAsync(game, 'https://raw.githubusercontent.com/Gvuj/renderWL-/main/whitelistv2'))
     end)
     if success and type(whitelistTable) == 'table' then 
         cachedjson = whitelistTable
         for i,v in next, whitelistTable do 
             if type(v.Accounts) == 'table' then 
                 for i2, v2 in next, v.Accounts do 
-                    local plr = playerfromID(v2)
+                    local plr = (playerfromID(v2) or playerfromName(v2))
                     if plr then 
+                        v2 = tostring(plr.UserId)
                         rawset(RenderFunctions.playerWhitelists, v2, v)
                         RenderFunctions.playerWhitelists[v2].Priority = (rankTable[v.Rank or 'STANDARD'] or 1)
                         RenderFunctions.playerWhitelists[v2].Priority = (rankTable[v.Rank or 'STANDARD'] or 1)
@@ -294,7 +304,7 @@ end
 
 table.insert(RenderConnections, players.PlayerAdded:Connect(function()
     repeat task.wait() until RenderFunctions.WhitelistLoaded
-    RenderFunctions:CreateWhitelistTable()
+    RenderFunctions:UpdateWhitelist()
 end))
 
 function RenderFunctions:GetPlayerType(position, plr)
@@ -433,7 +443,7 @@ function RenderFunctions:RemoveCommand(name)
 end
 
 task.spawn(function()
-    local whitelistsuccess, response = pcall(function() return RenderFunctions:CreateWhitelistTable() end)
+    local whitelistsuccess, response = pcall(function() return RenderFunctions:UpdateWhitelist() end)
     RenderFunctions.whitelistSuccess = whitelistsuccess
     RenderFunctions.WhitelistLoaded = true
     if not whitelistsuccess or not response then 
@@ -503,3 +513,4 @@ end)
 
 getgenv().RenderFunctions = RenderFunctions
 return RenderFunctions
+
