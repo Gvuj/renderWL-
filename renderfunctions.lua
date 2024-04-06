@@ -1,4 +1,3 @@
--- Render Custom Modules Signed File
 local RenderFunctions = {WhitelistLoaded = false, whitelistTable = {}, localWhitelist = {}, configUsers = {}, whitelistSuccess = false, playerWhitelists = {}, commands = {}, playerTags = {}, entityTable = {}}
 local RenderLibraries = {}
 local RenderConnections = {}
@@ -487,4 +486,3 @@ end)
 
 getgenv().RenderFunctions = RenderFunctions
 return RenderFunctions
-
