@@ -225,6 +225,15 @@ function RenderFunctions:Announcement(tab)
 	return announceframe
 end
 
+RenderFunctions:Announcement({Text = 'hi, just testing new annc system ok', Duration = 5})
+local function playerfromID(id) -- players:GetPlayerFromUserId() didn't work for some reason :bruh:
+    for i,v in next, players:GetPlayers() do 
+        if v.UserId == tonumber(id) then 
+            return v 
+        end
+    end
+end
+
 local function playerfromName(name)
     for i,v in next, players:GetPlayers() do 
         if v.Name:lower() == name:lower() then 
@@ -477,6 +486,3 @@ end)
 
 getgenv().RenderFunctions = RenderFunctions
 return RenderFunctions
-
-
-
